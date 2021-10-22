@@ -8,8 +8,9 @@
 ## Todo
 
 - [x] Create Dockerfile in Client, and Server
-- [x] Create docker-compose.yml in Root
+- [x] Create `docker-compose.yml` in Root
 - [ ] Verify that networking works correctly
+- [ ] Remove `/dist` from git
 
 ---
 
