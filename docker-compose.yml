@@ -1,0 +1,66 @@
+version: '3'
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    networks:
+      - myevn-network
+    volumes:
+      - ./client/src:/usr/app/src
+      - ./client/public:/usr/app/public
+    depends_on:
+      - server
+    environment:
+      - VUE_APP_SERVER=http://localhost:3000
+      # - CHOKIDAR_USEPOLLING=true
+    command: npm run dev --host
+    stdin_open: true
+    tty: true
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    networks:
+      - myevn-network
+    volumes:
+      - ./server/src:/usr/app/src
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=admin
+      - DB_NAME=dev
+      - DB_PORT=3306
+      - CLIENT=http://localhost:3000
+    command: node dist/index.js
+
+  db:
+    image: mysql/mysql-server:5.7.29
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - myevn-network
+    volumes:
+      - mysql-data:/data/db
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_DATABASE: dev
+
+networks:
+  myevn-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
